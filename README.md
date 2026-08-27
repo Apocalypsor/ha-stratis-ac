@@ -1,5 +1,9 @@
 # STRATIS AC for Home Assistant
 
+<p align="center">
+  <img src="custom_components/stratis_ac/brand/icon.png" alt="STRATIS logo" width="160">
+</p>
+
 An unofficial Home Assistant custom integration that exposes STRATIS-managed thermostats as native `climate` entities.
 
 > [!WARNING]
