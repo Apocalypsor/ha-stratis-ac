@@ -1,0 +1,54 @@
+{
+  "title": "STRATIS AC",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect STRATIS",
+        "description": "Enter the latest refresh token returned by the STRATIS OAuth token endpoint. This integration uses an unofficial cloud API.",
+        "data": {
+          "refresh_token": "Refresh token"
+        },
+        "data_description": {
+          "refresh_token": "Use the refresh_token from the response JSON, not the old token in the request body."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reconnect STRATIS",
+        "description": "The saved STRATIS session can no longer be refreshed. Enter a newly captured refresh token.",
+        "data": {
+          "refresh_token": "Refresh token"
+        },
+        "data_description": {
+          "refresh_token": "Use the latest refresh_token returned by a successful OAuth token response."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to STRATIS.",
+      "invalid_auth": "The refresh token is invalid, expired, or already rotated.",
+      "unknown": "Unexpected STRATIS error.",
+      "wrong_account": "This token belongs to a different STRATIS account."
+    },
+    "abort": {
+      "already_configured": "This STRATIS account is already configured.",
+      "reauth_successful": "STRATIS was reconnected successfully."
+    }
+  },
+  "exceptions": {
+    "control_failed": {
+      "message": "STRATIS rejected the thermostat command or could not be reached."
+    },
+    "unsupported_hvac_mode": {
+      "message": "The thermostat does not support HVAC mode {mode}."
+    },
+    "unsupported_fan_mode": {
+      "message": "The thermostat does not support fan mode {mode}."
+    },
+    "invalid_temperature_range": {
+      "message": "The lower target temperature must not exceed the upper target temperature."
+    },
+    "missing_temperature": {
+      "message": "The temperature command did not contain a target value."
+    }
+  }
+}

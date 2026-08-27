@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.coverage
+.pytest_cache/
+.ruff_cache/
+.venv/
+htmlcov/
+.DS_Store
+*.har
+token.json
+secrets.yaml

@@ -1,0 +1,54 @@
+{
+  "title": "STRATIS 空调",
+  "config": {
+    "step": {
+      "user": {
+        "title": "连接 STRATIS",
+        "description": "请输入 STRATIS OAuth token 接口最新响应中的 refresh token。本集成使用非公开云端接口。",
+        "data": {
+          "refresh_token": "刷新令牌"
+        },
+        "data_description": {
+          "refresh_token": "请使用响应 JSON 中的新 refresh_token，不要使用请求体里已经轮换的旧值。"
+        }
+      },
+      "reauth_confirm": {
+        "title": "重新连接 STRATIS",
+        "description": "已保存的 STRATIS 会话无法继续刷新。请输入重新抓取的 refresh token。",
+        "data": {
+          "refresh_token": "刷新令牌"
+        },
+        "data_description": {
+          "refresh_token": "请使用最近一次成功 OAuth token 响应返回的 refresh_token。"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "无法连接 STRATIS。",
+      "invalid_auth": "刷新令牌无效、已过期或已经被轮换。",
+      "unknown": "STRATIS 返回了意外错误。",
+      "wrong_account": "此令牌属于另一个 STRATIS 账户。"
+    },
+    "abort": {
+      "already_configured": "此 STRATIS 账户已经配置。",
+      "reauth_successful": "STRATIS 已重新连接。"
+    }
+  },
+  "exceptions": {
+    "control_failed": {
+      "message": "STRATIS 拒绝了温控指令，或当前无法连接。"
+    },
+    "unsupported_hvac_mode": {
+      "message": "温控器不支持 {mode} 模式。"
+    },
+    "unsupported_fan_mode": {
+      "message": "温控器不支持 {mode} 风扇模式。"
+    },
+    "invalid_temperature_range": {
+      "message": "最低目标温度不能高于最高目标温度。"
+    },
+    "missing_temperature": {
+      "message": "温度指令中没有目标值。"
+    }
+  }
+}

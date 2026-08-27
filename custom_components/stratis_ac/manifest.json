@@ -1,0 +1,12 @@
+{
+  "domain": "stratis_ac",
+  "name": "STRATIS AC",
+  "codeowners": ["@Apocalypsor"],
+  "config_flow": true,
+  "documentation": "https://github.com/Apocalypsor/ha-stratis-ac",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/Apocalypsor/ha-stratis-ac/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
