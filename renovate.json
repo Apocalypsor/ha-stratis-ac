@@ -4,6 +4,20 @@
   "dependencyDashboard": true,
   "labels": ["dependencies"],
   "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "description": "Keep the Home Assistant test stack compatible with Python 3.13",
+      "matchManagers": ["pep621"],
+      "matchPackageNames": ["pytest-homeassistant-custom-component"],
+      "allowedVersions": "<0.13.317"
+    },
+    {
+      "description": "Avoid duplicate pre-commit major and minor update PRs",
+      "matchManagers": ["pep621"],
+      "matchPackageNames": ["pre-commit"],
+      "separateMajorMinor": false
+    }
+  ],
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["before 6am on monday"]
