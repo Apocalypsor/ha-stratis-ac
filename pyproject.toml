@@ -10,7 +10,7 @@ dependencies = []
 dev = [
     "pre-commit>=3.5.0",
     "pytest>=8.0.0",
-    "pytest-homeassistant-custom-component>=0.13.0",
+    "pytest-homeassistant-custom-component>=0.13.357",
     "ruff>=0.16.4",
 ]
 
