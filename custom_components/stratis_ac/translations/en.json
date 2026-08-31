@@ -49,6 +49,9 @@
     },
     "missing_temperature": {
       "message": "The temperature command did not contain a target value."
+    },
+    "temperature_while_off": {
+      "message": "Turn on the thermostat before changing its target temperature."
     }
   }
 }

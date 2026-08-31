@@ -206,8 +206,6 @@ class StratisClimateEntity(
             return self.thermostat.temperature("setpoint_low")
         if mode == HVACMode.COOL:
             return self.thermostat.temperature("setpoint_high")
-        if mode == HVACMode.OFF:
-            return self.thermostat.temperature("setpoint_high")
         return None
 
     @property
@@ -235,13 +233,11 @@ class StratisClimateEntity(
 
     @property
     def supported_features(self) -> ClimateEntityFeature:
-        features = (
-            ClimateEntityFeature.TARGET_TEMPERATURE
-            | ClimateEntityFeature.TURN_ON
-            | ClimateEntityFeature.TURN_OFF
-        )
-        if HVACMode.HEAT_COOL in self.hvac_modes:
-            features |= ClimateEntityFeature.TARGET_TEMPERATURE_RANGE
+        features = ClimateEntityFeature.TURN_ON | ClimateEntityFeature.TURN_OFF
+        if self.hvac_mode != HVACMode.OFF:
+            features |= ClimateEntityFeature.TARGET_TEMPERATURE
+            if HVACMode.HEAT_COOL in self.hvac_modes:
+                features |= ClimateEntityFeature.TARGET_TEMPERATURE_RANGE
         if self.fan_modes:
             features |= ClimateEntityFeature.FAN_MODE
         return features
@@ -316,6 +312,11 @@ class StratisClimateEntity(
                 translation_domain=DOMAIN,
                 translation_key="unsupported_hvac_mode",
                 translation_placeholders={"mode": mode},
+            )
+        if mode == HVACMode.OFF:
+            raise ServiceValidationError(
+                translation_domain=DOMAIN,
+                translation_key="temperature_while_off",
             )
 
         payload: dict[str, Any] = {}

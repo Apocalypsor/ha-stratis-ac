@@ -6,8 +6,13 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from homeassistant.components.climate import HVACAction, HVACMode
+from homeassistant.components.climate import (
+    ClimateEntityFeature,
+    HVACAction,
+    HVACMode,
+)
 from homeassistant.const import UnitOfTemperature
+from homeassistant.exceptions import ServiceValidationError
 
 from custom_components.stratis_ac.climate import StratisClimateEntity
 from custom_components.stratis_ac.models import StratisData, StratisThermostat
@@ -59,6 +64,31 @@ def test_target_temperature_step_uses_display_unit(
     assert entity.target_temperature_step == expected_step
 
 
+def test_temperature_controls_are_disabled_while_off(
+    entity: StratisClimateEntity,
+) -> None:
+    entity.thermostat.state["thermostat_mode"]["value"] = "OFF"
+
+    assert entity.hvac_mode == HVACMode.OFF
+    assert entity.target_temperature is None
+    assert not entity.supported_features & ClimateEntityFeature.TARGET_TEMPERATURE
+    assert not entity.supported_features & ClimateEntityFeature.TARGET_TEMPERATURE_RANGE
+
+
+@pytest.mark.asyncio
+async def test_temperature_write_is_rejected_while_off(
+    entity: StratisClimateEntity,
+) -> None:
+    entity.thermostat.state["thermostat_mode"]["value"] = "OFF"
+    entity._async_write = AsyncMock()
+
+    with pytest.raises(ServiceValidationError) as err:
+        await entity.async_set_temperature(temperature=72)
+
+    assert err.value.translation_key == "temperature_while_off"
+    entity._async_write.assert_not_awaited()
+
+
 @pytest.mark.asyncio
 async def test_cooling_temperature_payload_preserves_confirmed_value(
     entity: StratisClimateEntity,
@@ -82,6 +112,7 @@ async def test_cooling_temperature_payload_preserves_confirmed_value(
 async def test_heat_mode_and_temperature_can_be_sent_together(
     entity: StratisClimateEntity,
 ) -> None:
+    entity.thermostat.state["thermostat_mode"]["value"] = "OFF"
     entity._async_write = AsyncMock()
 
     await entity.async_set_temperature(hvac_mode=HVACMode.HEAT, temperature=69)

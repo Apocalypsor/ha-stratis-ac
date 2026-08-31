@@ -49,6 +49,9 @@
     },
     "missing_temperature": {
       "message": "温度指令中没有目标值。"
+    },
+    "temperature_while_off": {
+      "message": "请先开启温控器，再调整目标温度。"
     }
   }
 }
