@@ -150,7 +150,11 @@ class StratisClimateEntity(
 
     @property
     def target_temperature_step(self) -> float:
-        return 0.5 if self.temperature_unit == UnitOfTemperature.CELSIUS else 1.0
+        return (
+            0.5
+            if self.hass.config.units.temperature_unit == UnitOfTemperature.CELSIUS
+            else 1.0
+        )
 
     @property
     def min_temp(self) -> float:

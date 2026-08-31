@@ -42,6 +42,23 @@ def test_climate_state_mapping(entity: StratisClimateEntity) -> None:
     assert entity.fan_modes == ["auto", "on"]
 
 
+@pytest.mark.parametrize(
+    ("display_unit", "expected_step"),
+    [
+        (UnitOfTemperature.CELSIUS, 0.5),
+        (UnitOfTemperature.FAHRENHEIT, 1.0),
+    ],
+)
+def test_target_temperature_step_uses_display_unit(
+    entity: StratisClimateEntity, display_unit: str, expected_step: float
+) -> None:
+    entity.hass = MagicMock()
+    entity.hass.config.units.temperature_unit = display_unit
+
+    assert entity.temperature_unit == UnitOfTemperature.FAHRENHEIT
+    assert entity.target_temperature_step == expected_step
+
+
 @pytest.mark.asyncio
 async def test_cooling_temperature_payload_preserves_confirmed_value(
     entity: StratisClimateEntity,
