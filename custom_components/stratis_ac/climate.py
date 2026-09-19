@@ -22,6 +22,7 @@ from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util.unit_conversion import TemperatureConverter
 
 from . import StratisRuntimeData
 from .api import StratisError
@@ -203,22 +204,41 @@ class StratisClimateEntity(
     def target_temperature(self) -> float | None:
         mode = self.hvac_mode
         if mode == HVACMode.HEAT:
-            return self.thermostat.temperature("setpoint_low")
+            return self._target_temperature("setpoint_low")
         if mode == HVACMode.COOL:
-            return self.thermostat.temperature("setpoint_high")
+            return self._target_temperature("setpoint_high")
         return None
 
     @property
     def target_temperature_low(self) -> float | None:
         if self.hvac_mode != HVACMode.HEAT_COOL:
             return None
-        return self.thermostat.temperature("auto_setpoint_low")
+        return self._target_temperature("auto_setpoint_low")
 
     @property
     def target_temperature_high(self) -> float | None:
         if self.hvac_mode != HVACMode.HEAT_COOL:
             return None
-        return self.thermostat.temperature("auto_setpoint_high")
+        return self._target_temperature("auto_setpoint_high")
+
+    def _snap_target_temperature(self, temperature: float) -> float:
+        """Align a native temperature to fixed steps in the HA display unit."""
+        display_unit = self.hass.config.units.temperature_unit
+        displayed = TemperatureConverter.convert(
+            temperature, self.temperature_unit, display_unit
+        )
+        step = self.target_temperature_step
+        snapped = round(displayed / step) * step
+        return TemperatureConverter.convert(
+            snapped, display_unit, self.temperature_unit
+        )
+
+    def _target_temperature(self, field_name: str) -> float | None:
+        """Expose an aligned setpoint without changing the ambient reading."""
+        temperature = self.thermostat.temperature(field_name)
+        if temperature is None:
+            return None
+        return self._snap_target_temperature(temperature)
 
     @property
     def fan_modes(self) -> list[str] | None:
@@ -251,6 +271,7 @@ class StratisClimateEntity(
     def _temperature_payload(
         self, field_name: str, requested_temperature: float
     ) -> dict[str, float | int | str]:
+        requested_temperature = self._snap_target_temperature(requested_temperature)
         return {
             "value_int": self.thermostat.confirmed_integral_temperature(
                 field_name, requested_temperature

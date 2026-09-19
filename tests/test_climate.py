@@ -12,7 +12,10 @@ from homeassistant.components.climate import (
     HVACMode,
 )
 from homeassistant.const import UnitOfTemperature
+from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
+from homeassistant.util.unit_conversion import TemperatureConverter
+from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM
 
 from custom_components.stratis_ac.climate import StratisClimateEntity
 from custom_components.stratis_ac.models import StratisData, StratisThermostat
@@ -27,7 +30,10 @@ def entity(thermostat_api_data: dict[str, Any]) -> StratisClimateEntity:
         properties={}, thermostats={thermostat.device_id: thermostat}
     )
     coordinator.last_update_success = True
-    return StratisClimateEntity(coordinator, thermostat.device_id)
+    entity = StratisClimateEntity(coordinator, thermostat.device_id)
+    entity.hass = MagicMock()
+    entity.hass.config.units.temperature_unit = UnitOfTemperature.FAHRENHEIT
+    return entity
 
 
 def test_climate_state_mapping(entity: StratisClimateEntity) -> None:
@@ -73,6 +79,72 @@ def test_temperature_controls_are_disabled_while_off(
     assert entity.target_temperature is None
     assert not entity.supported_features & ClimateEntityFeature.TARGET_TEMPERATURE
     assert not entity.supported_features & ClimateEntityFeature.TARGET_TEMPERATURE_RANGE
+
+
+@pytest.mark.parametrize(
+    ("mode", "field", "attribute"),
+    [
+        ("COOL", "setpoint_high", "temperature"),
+        ("HEAT", "setpoint_low", "temperature"),
+        ("AUTO", "auto_setpoint_low", "target_temp_low"),
+        ("AUTO", "auto_setpoint_high", "target_temp_high"),
+    ],
+)
+@pytest.mark.parametrize("celsius", [True, False])
+def test_reported_targets_align_to_fixed_steps(
+    entity: StratisClimateEntity,
+    hass: HomeAssistant,
+    mode: str,
+    field: str,
+    attribute: str,
+    celsius: bool,
+) -> None:
+    entity.hass = hass
+    hass.config.units = METRIC_SYSTEM if celsius else US_CUSTOMARY_SYSTEM
+    entity.thermostat.state["thermostat_mode"]["value"] = mode
+    entity.thermostat.state[field]["value"] = 73.2
+
+    attributes = entity.state_attributes
+    assert attributes[attribute] == (23.0 if celsius else 73.0)
+    assert attributes["current_temperature"] == (24.4 if celsius else 76)
+    assert entity.thermostat.temperature(field) == 73.2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("display_unit", "requested", "expected"),
+    [
+        (UnitOfTemperature.CELSIUS, 22, 22),
+        (UnitOfTemperature.CELSIUS, 22.5, 22.5),
+        (UnitOfTemperature.CELSIUS, 23, 23),
+        (UnitOfTemperature.CELSIUS, 23.5, 23.5),
+        (UnitOfTemperature.CELSIUS, 22.8, 23),
+        (UnitOfTemperature.FAHRENHEIT, 72.3, 72),
+    ],
+)
+@pytest.mark.parametrize("native_scale", ["C", "F"])
+async def test_temperature_write_uses_fixed_display_steps(
+    entity: StratisClimateEntity,
+    display_unit: str,
+    requested: float,
+    expected: float,
+    native_scale: str,
+) -> None:
+    entity.hass.config.units.temperature_unit = display_unit
+    entity.thermostat.state["ambient_temperature"]["scale"] = native_scale
+    entity._async_write = AsyncMock()
+    native_request = TemperatureConverter.convert(
+        requested, display_unit, entity.temperature_unit
+    )
+
+    await entity.async_set_temperature(temperature=native_request)
+
+    payload = entity._async_write.call_args.args[0]["setpoint_high"]
+    assert payload["value"] == pytest.approx(
+        TemperatureConverter.convert(expected, display_unit, entity.temperature_unit)
+    )
+    assert payload["value_int"] == 73
+    assert payload["scale"] == native_scale
 
 
 @pytest.mark.asyncio
