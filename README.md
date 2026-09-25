@@ -23,6 +23,7 @@ An unofficial Home Assistant custom integration that exposes STRATIS-managed the
 - One forced refresh and retry after an HTTP 401
 - Home Assistant reauthentication flow when the session can no longer refresh
 - Redacted diagnostics
+- A manual refresh button on each thermostat's device page
 - English and Simplified Chinese UI
 
 The integration polls every 30 seconds. STRATIS also exposes a temporary WebSocket stream, but polling is intentionally the reliable baseline and does not depend on a short-lived streaming URL.
@@ -71,6 +72,15 @@ STRATIS mode values are mapped as follows:
 | `OFF` | Off |
 
 Temperature writes preserve the payload behavior observed from the mobile app: the requested temperature is written to `value`, the last confirmed integral temperature remains in `value_int`, and the thermostat's native `C` or `F` scale is included.
+
+### Manual refresh
+
+Open **Settings → Devices & services → STRATIS AC → your thermostat** and press
+**Refresh state** in the diagnostic entities section. You can also add this button
+entity to a dashboard. The button requests a fresh STRATIS cloud snapshot for all
+thermostats on the account; repeated requests are debounced. It remains usable
+after a failed poll or an offline report so you can retry. Changes made in Google
+Nest must reach STRATIS before a refresh can show them in Home Assistant.
 
 ## Troubleshooting
 

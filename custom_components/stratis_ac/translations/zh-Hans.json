@@ -34,6 +34,13 @@
       "reauth_successful": "STRATIS 已重新连接。"
     }
   },
+  "entity": {
+    "button": {
+      "refresh_state": {
+        "name": "刷新状态"
+      }
+    }
+  },
   "exceptions": {
     "control_failed": {
       "message": "STRATIS 拒绝了温控指令，或当前无法连接。"

@@ -34,6 +34,13 @@
       "reauth_successful": "STRATIS was reconnected successfully."
     }
   },
+  "entity": {
+    "button": {
+      "refresh_state": {
+        "name": "Refresh state"
+      }
+    }
+  },
   "exceptions": {
     "control_failed": {
       "message": "STRATIS rejected the thermostat command or could not be reached."
