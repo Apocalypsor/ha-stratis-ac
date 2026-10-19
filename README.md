@@ -24,6 +24,7 @@ An unofficial Home Assistant custom integration that exposes STRATIS-managed the
 - Home Assistant reauthentication flow when the session can no longer refresh
 - Redacted diagnostics
 - A manual refresh button on each thermostat's device page
+- An extra state refresh when a Home Assistant client connects or reconnects
 - English and Simplified Chinese UI
 
 The integration polls every 30 seconds. STRATIS also exposes a temporary WebSocket stream, but polling is intentionally the reliable baseline and does not depend on a short-lived streaming URL.
@@ -65,11 +66,11 @@ The mobile app and Home Assistant may initially hold the same rotating refresh t
 STRATIS mode values are mapped as follows:
 
 | STRATIS | Home Assistant |
-| --- | --- |
-| `HEAT` | Heat |
-| `COOL` | Cool |
-| `AUTO` | Heat/Cool |
-| `OFF` | Off |
+| ------- | -------------- |
+| `HEAT`  | Heat           |
+| `COOL`  | Cool           |
+| `AUTO`  | Heat/Cool      |
+| `OFF`   | Off            |
 
 Temperature writes preserve the payload behavior observed from the mobile app: the requested temperature is written to `value`, the last confirmed integral temperature remains in `value_int`, and the thermostat's native `C` or `F` scale is included.
 

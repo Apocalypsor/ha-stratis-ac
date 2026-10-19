@@ -5,9 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from homeassistant.components.websocket_api.const import SIGNAL_WEBSOCKET_CONNECTED
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .api import StratisApiClient
 from .const import (
@@ -55,6 +57,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: StratisConfigEntry) -> b
 
     entry.runtime_data = StratisRuntimeData(client=client, coordinator=coordinator)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    entry.async_on_unload(
+        async_dispatcher_connect(
+            hass, SIGNAL_WEBSOCKET_CONNECTED, coordinator.async_request_refresh
+        )
+    )
     return True
 
 

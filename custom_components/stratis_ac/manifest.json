@@ -1,6 +1,7 @@
 {
   "domain": "stratis_ac",
   "name": "STRATIS AC",
+  "after_dependencies": ["websocket_api"],
   "codeowners": ["@Apocalypsor"],
   "config_flow": true,
   "documentation": "https://github.com/Apocalypsor/ha-stratis-ac",
