@@ -9,8 +9,9 @@ dependencies = []
 [dependency-groups]
 dev = [
     "pre-commit>=4.7.0",
+    # The HA test plugin pins pytest; keep this lower bound compatible with it.
     "pytest>=8.4.2",
-    "pytest-homeassistant-custom-component>=0.13.316",
+    "pytest-homeassistant-custom-component>=0.13.375",
     "ruff>=0.17.3",
 ]
 
