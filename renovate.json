@@ -6,10 +6,10 @@
   "rangeStrategy": "bump",
   "packageRules": [
     {
-      "description": "Keep the Home Assistant test stack compatible with Python 3.13",
+      "description": "Let the HA test plugin constrain pytest; update it through lockfile maintenance",
       "matchManagers": ["pep621"],
-      "matchPackageNames": ["pytest-homeassistant-custom-component"],
-      "allowedVersions": "<0.13.317"
+      "matchPackageNames": ["pytest"],
+      "rangeStrategy": "replace"
     },
     {
       "description": "Avoid duplicate pre-commit major and minor update PRs",
