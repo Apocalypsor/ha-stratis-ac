@@ -12,7 +12,7 @@ dev = [
     # The HA test plugin pins pytest; keep this lower bound compatible with it.
     "pytest>=8.4.2",
     "pytest-homeassistant-custom-component>=0.13.375",
-    "ruff>=0.17.4",
+    "ruff>=0.17.5",
 ]
 
 [tool.uv]
